@@ -58,12 +58,13 @@ if __name__ == "__main__":
     for feature in ['sift', 'surf', 'orb']:
         for algo in ['kmeans', 'hierarchical']:
             for dict_size in [20, 50]:
+                start = timer()
                 vocabulary = buildDict(train_images, dict_size, feature, algo)
                 filename = 'voc_' + feature + '_' + algo + '_' + str(dict_size) + '.npy'
                 np.save(SAVEPATH + filename, np.asarray(vocabulary))
                 vocabularies.append(vocabulary) # A list of vocabularies (which are 2D arrays)
                 vocab_idx.append(filename.split('.')[0]) # Save the map from index to vocabulary
-                print('finished file: ' + filename)
+                print('finished file: %s in %4.3f seconds' % (filename, timer() - start))
                 
     # Compute the Bow representation for the training and testing sets
     test_rep = [] # To store a set of BOW representations for the test images (given a vocabulary)
@@ -73,18 +74,20 @@ if __name__ == "__main__":
     
     # You need to write ComputeBow()
     for i, vocab in enumerate(vocabularies):
+        start = timer()
         for image in train_images: # Compute the BOW representation of the training set
             rep = computeBow(image, vocab, features[i]) # Rep is a list of descriptors for a given image
             train_rep.append(rep)
         np.save(SAVEPATH + 'bow_train_' + str(i) + '.npy', np.asarray(train_rep)) # Save the representations for vocabulary i
         train_rep = [] # reset the list to save the following vocabulary
-        print('finished file: ' + SAVEPATH + 'bow_train_' + str(i) + '.npy')
+        print('finished file: %sbow_train_%d.npy in %4.3f seconds' % (SAVEPATH, i, timer() - start))
+        start = timer()
         for image in test_images: # Compute the BOW representation of the testing set
             rep = computeBow(image, vocab, features[i])
             test_rep.append(rep)
         np.save(SAVEPATH + 'bow_test_' + str(i) + '.npy', np.asarray(test_rep)) # Save the representations for vocabulary i
         test_rep = [] # reset the list to save the following vocabulary
-        print('finished file: ' + SAVEPATH + 'bow_test_' + str(i) + '.npy')
+        print('finished file: %sbow_test_%d.npy in %4.3f seconds' % (SAVEPATH, i, timer() - start))
 
 
 
@@ -110,7 +113,7 @@ if __name__ == "__main__":
 
             knn_accuracies.append(accuracy)
             knn_runtimes.append(end_timer - start_timer)
-            print('KNN using %s and %s with %d words & %d neighbors: %d percent in %d seconds' 
+            print('KNN using %s and %s with %d words & %d neighbors: %d percent in %4.3f seconds' 
                 % (features[index], algos[index], dict_sizes[index], i, accuracy, end_timer - start_timer))
 
     np.save(SAVEPATH+'knn_accuracies.npy', np.asarray(knn_accuracies)) # Save the accuracies in the Results/ directory
@@ -137,7 +140,7 @@ if __name__ == "__main__":
        
         lin_accuracies.append(accuracy)
         lin_runtimes.append(end_timer - start_timer)
-        print('Linear SVM using %s and %s with %d words: %d percent in %d seconds' 
+        print('Linear SVM using %s and %s with %d words: %d percent in %4.3f seconds' 
             % (features[index], algos[index], dict_sizes[index], accuracy, end_timer - start_timer))
 
     np.save(SAVEPATH+'lin_accuracies.npy', np.asarray(lin_accuracies)) # Save the accuracies in the Results/ directory
@@ -163,7 +166,7 @@ if __name__ == "__main__":
        
         rbf_accuracies.append(accuracy)
         rbf_runtimes.append(end_timer - start_timer)
-        print('RBF SVM using %s and %s with %d words: %d percent in %d seconds' 
+        print('RBF SVM using %s and %s with %d words: %d percent in %4.3f seconds' 
             % (features[index], algos[index], dict_sizes[index], accuracy, end_timer - start_timer))
     
     np.save(SAVEPATH +'rbf_accuracies.npy', np.asarray(rbf_accuracies)) # Save the accuracies in the Results/ directory
