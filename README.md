@@ -1,4 +1,4 @@
-# Computer Vision Basics
+# Image Classification Project
 
 
 ## Table of contents
